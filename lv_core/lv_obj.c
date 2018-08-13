@@ -443,16 +443,25 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     old_pos.y = lv_obj_get_y(obj);
 
     lv_obj_t * old_par = obj->par;
+    if(obj->par != NULL && parent != NULL)
+    {
+    	lv_ll_chg_list(&obj->par->child_ll, &parent->child_ll, obj);
+    }
 
-    lv_ll_chg_list(&obj->par->child_ll, &parent->child_ll, obj);
     obj->par = parent;
     lv_obj_set_pos(obj, old_pos.x, old_pos.y);
 
     /*Notify the original parent because one of its children is lost*/
-    old_par->signal_func(old_par, LV_SIGNAL_CHILD_CHG, NULL);
+    if(old_par != NULL)
+    {
+    	old_par->signal_func(old_par, LV_SIGNAL_CHILD_CHG, NULL);
+    }
 
     /*Notify the new parent about the child*/
-    parent->signal_func(parent, LV_SIGNAL_CHILD_CHG, obj);
+    if(parent != NULL)
+    {
+    	parent->signal_func(parent, LV_SIGNAL_CHILD_CHG, obj);
+    }
 
     lv_obj_invalidate(obj);
 }
